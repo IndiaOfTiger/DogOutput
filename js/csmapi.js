@@ -1,5 +1,4 @@
 var csmapi = (function () {
-    
     var ENDPOINT = window.location.origin;
 
     function set_endpoint (endpoint) {
@@ -44,6 +43,7 @@ var csmapi = (function () {
     }
 
     function pull (mac_addr, odf_name, callback) {
+        console.log("odf:", odf_name);
         $.ajax({
             type: 'GET',
             url: ENDPOINT +'/'+ mac_addr +'/'+ odf_name,
@@ -64,6 +64,7 @@ var csmapi = (function () {
     }
 
     function push (mac_addr, idf_name, data, callback) {
+        console.log("idf:", idf_name);
         $.ajax({
             type: 'PUT',
             url: ENDPOINT +'/'+ mac_addr +'/'+ idf_name,
