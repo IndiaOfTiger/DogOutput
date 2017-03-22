@@ -6,20 +6,15 @@ var dan = (function () {
     var _mac_addr = '';
     var _profile = {};
     var _registered = false;
-    var _idf_list=[];
-    var _odf_list=[];
+    var _df_list;
     var _df_selected = {};
     var _df_is_odf = {};
     var _df_timestamp = {};
     var _suspended = true;
     var _ctl_timestamp = '';
-    var _origin_idf_list=[];
-    var _origin_odf_list=[];
 
     function init (pull, endpoint, mac_addr, profile, callback) {
         _pull = pull;
-        //_origin_idf_list=profile.origin_idf_list;
-        //_origin_odf_list=profile.origin_odf_list;
         _mac_addr = mac_addr;
 
         function init_callback (result) {
@@ -45,30 +40,18 @@ var dan = (function () {
             if (result) {
                 if (!_registered) {
                     _registered = true;
-                    _idf_list = profile['idf_list'].slice();
-                    _odf_list = profile['odf_list'].slice();
-_origin_idf_list = profile['origin_idf_list'].slice();
-_origin_odf_list = profile['origin_odf_list'].slice();
-                    for (var i = 0; i < _odf_list.length; i++) {
-                        _df_selected[_odf_list[i]] = false;
-                        _df_is_odf[_odf_list[i]] = true;
-                        _df_timestamp[_odf_list[i]] = '';
+                    _df_list = profile['df_list'].slice();
+                    for (var i = 0; i < _df_list.length; i++) {
+                        _df_selected[_df_list[i]] = false;
+                        _df_is_odf[_df_list[i]] = true;
+                        _df_timestamp[_df_list[i]] = '';
                         _ctl_timestamp = '';
                         _suspended = true;
                     }
-                    for (var i = 0; i < _idf_list.length; i++) {
-                        _df_selected[_idf_list[i]] = false;
-                        _df_is_odf[_idf_list[i]] = false;
-                        _df_timestamp[_idf_list[i]] = '';
-                        _ctl_timestamp = '';
-                        _suspended = true;
-                    }
-                    //setTimeout(pull_ctl, 0);
-                    setTimeout(push_ctl, 0);
+                    setTimeout(pull_ctl, 0);
                 }
                 callback(true);
             } else {
-                //console.log(result);
                 if (retry_count < 2) {
                     retry_count += 1;
                     setTimeout(function () {
@@ -109,12 +92,12 @@ _origin_odf_list = profile['origin_odf_list'].slice();
             return;
         }
 
-        if (_suspended || index >= _odf_list.length) {
+        if (_suspended || index >= _df_list.length) {
             setTimeout(pull_ctl, POLLING_INTERVAL);
             return;
         }
 
-        var _df_name = _odf_list[index];
+        var _df_name = _df_list[index];
 
         if (!_df_is_odf[_df_name] || !_df_selected[_df_name]) {
             pull_odf(index + 1);
@@ -122,62 +105,14 @@ _origin_odf_list = profile['origin_odf_list'].slice();
         }
 
         function pull_odf_callback (dataset, error) {
-            if (has_new_data(dataset, _df_timestamp[_odf_list[index]])) {
-                _df_timestamp[_odf_list[index]] = dataset[0][0];
-                _pull(_odf_list[index], dataset[0][1]);
+            if (has_new_data(dataset, _df_timestamp[_df_list[index]])) {
+                _df_timestamp[_df_list[index]] = dataset[0][0];
+                _pull(_df_list[index], dataset[0][1]);
             }
 
             pull_odf(index + 1);
         }
-        csmapi.pull(_mac_addr, _df_name,/*_odf_list,*/ pull_odf_callback);
-    }
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////
-    function push_ctl () {
-
-        if (!_registered) {
-            return;
-        }
-        /*function push_ctl_callback (dataset, error) {
-            if (has_new_data(dataset, _ctl_timestamp)) {
-                _ctl_timestamp = dataset[0][0];
-                if (handle_command_message(dataset[0][1])) {
-                    _pull('Control', dataset[0][1]);
-                } else {
-                    console.log('Problematic command message:', dataset[0][1]);
-                }
-            }
-            push_idf(0);
-        }*/
-        push_idf(0);
-        
-        //csmapi.push(_mac_addr, '__Ctl_I__',_origin_idf_list, push_ctl_callback);
-    }
-
-    function push_idf (index) {
-
-        if (!_registered) {
-            return;
-        }
-
-        if (index >= _idf_list.length) {
-            setTimeout(push_ctl, POLLING_INTERVAL);
-            return;
-        }
-
-        var _df_name = _idf_list[index];
-
-
-        function push_idf_callback () {
-            push_idf(index + 1);
-        }
-        console.log(_df_name);
-console.log(_origin_idf_list[index]());
-        csmapi.push(_mac_addr, _df_name , _origin_idf_list[index]() , push_idf_callback);
+        csmapi.pull(_mac_addr, _df_name, pull_odf_callback);
     }
 
     function handle_command_message (data) {
@@ -190,14 +125,13 @@ console.log(_origin_idf_list[index]());
             break;
         case 'SET_DF_STATUS':
             flags = data[1]['cmd_params'][0]
-            /*if (flags.length != _idf_list.length) {
-                console.log(flags, _idf_list);
+            if (flags.length != _df_list.length) {
+                console.log(flags, _df_list);
                 return false;
-            }*/
+            }
 
-            for (var i = 0; i < _idf_list.length; i++) {
-                _df_selected[_idf_list[i]] = (flags[i] == '1');
-console.log(flags);
+            for (var i = 0; i < _df_list.length; i++) {
+                _df_selected[_df_list[i]] = (flags[i] == '1');
             }
             break;
         default:
@@ -209,7 +143,6 @@ console.log(flags);
 
     function has_new_data (dataset, timestamp) {
         if (dataset.length == 0 || timestamp == dataset[0][0]) {
- console.log('newnewnewnew');
             return false;
         }
         return true;
