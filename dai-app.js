@@ -572,7 +572,7 @@ infowindowAlert.open(map, markerAlert);
             else
             {
                 monitorArea1.setOptions({strokeColor:'#000000'});
-                monitorArea1.setOptions({strokeColor:'#000000'}); 
+                monitorArea2.setOptions({strokeColor:'#000000'}); 
                 //infowindowAlert.close(map, markerAlert);
             }
         }
