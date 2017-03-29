@@ -325,16 +325,39 @@ $(function(){
         var lat;
         var lng;
         var description;
+        var LastLatLng;
+        var ThisLastLng;
+        
+        function getDistance(p1, p2) {
+            var Earth_R = 6378137; // Earth’s mean radius in meter
+            var dLat = rad(p2.lat() - p1.lat());
+            var dLong = rad(p2.lng() - p1.lng());
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+                    Math.sin(dLong / 2) * Math.sin(dLong / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = Earth_R * c;
+            return d; // returns the distance in meter
+        }
+        function generate_latLng(lat,lng)
+        {
+            var temp = new google.maps.LatLng(lat , lng);
+            return temp;
+        }
 
         function IDGeoLoTime_O  (data){
            console.log(data[0]);
            id = data[0].TrackerID;
            lat = parseFloat(data[0].N);
            lng = parseFloat(data[0].E);
+           ThisLastLng = generate_latLng(lat,lng);
            receiveTime = data[0].Time;
            description = id + ': ' + receiveTime;
-           if(id == "0")
-            addMarker(lat, lng, id);
+           if(id == "0" && getDistance(LastLatLng,ThisLastLng) > 1)
+           {
+               addMarker(lat, lng, id);
+               LastLatLng = generate_latLng(lat,lng);
+           }
         }
 
         var polyCoordinates = [];
@@ -469,9 +492,19 @@ $(function(){
               var monitorPosition;
 
               if(inMonitorArea1)
+{
                 monitorPosition = monitorCoordinates1[1];
+monitorArea1.setOptions({strokeColor:'#FF0000'});
+//alert('123');
+//monitorArea1.setMap(map);
+}
               else
+{
                 monitorPosition = monitorCoordinates2[1];
+monitorArea2.setOptions({strokeColor:'#FF0000'});
+//alert('456');
+//monitorArea2.setMap(map);
+}
 
               changepinImage(177,26,26);
               var markerAlert = new google.maps.Marker({
@@ -480,12 +513,14 @@ $(function(){
                   fillOpacity: 0.4,
                   icon: pinImage
                   });
+              markerAlert.setVisible(false);
               contentString = '<div style="padding-left:10px;color: #000000;background: #000000;border-radius:10px 10px 5px 5px;">' +
               '<iframe width="500" height="275" src="https://www.youtube.com/embed/jYvVG8D837A" frameborder="0" allowfullscreen></iframe>'
               + '</div>';
               infowindowAlert = new google.maps.InfoWindow({
                     content: contentString
                 });
+infowindowAlert.open(map, markerAlert);
 
               if(firstCurrent)
               {
@@ -497,7 +532,7 @@ $(function(){
                     infowindowAlert.close();
                   $(videoDom).html('');
                   $(videoDom).append(contentString);
-                  //infowindowAlert.open(map, currentMarker)
+                  infowindowAlert.open(map, currentMarker)
                 }
               }
               else
@@ -529,6 +564,12 @@ $(function(){
                   //infowindowAlert.open(map, previousMarker);
                 }
               }
+            }
+            else
+            {
+                monitorArea1.setOptions({strokeColor:'#000000'});
+                monitorArea1.setOptions({strokeColor:'#000000'}); 
+                //infowindowAlert.close(map, markerAlert);
             }
         }
 
@@ -624,3 +665,45 @@ $(function(){
        
         
 });
+
+
+
+
+
+
+/*
+var LastLatLng;
+        var ThisLastLng;
+        
+        function getDistance(p1, p2) {
+            var Earth_R = 6378137; // Earth’s mean radius in meter
+            var dLat = rad(p2.lat() - p1.lat());
+            var dLong = rad(p2.lng() - p1.lng());
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+                    Math.sin(dLong / 2) * Math.sin(dLong / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = Earth_R * c;
+            return d; // returns the distance in meter
+        }
+        function generate_latLng(lat,lng)
+        {
+            var temp = new google.maps.LatLng(lat , lng);
+            return temp;
+        }
+
+        function IDGeoLoTime_O  (data){
+           console.log(data[0]);
+           id = data[0].TrackerID;
+           lat = parseFloat(data[0].N);
+           lng = parseFloat(data[0].E);
+           ThisLastLng = generate_latLng(lat,lng);
+           receiveTime = data[0].Time;
+           description = id + ': ' + receiveTime;
+           if(id == "0" && getDistance(LastLatLng,ThisLastLng) > 1)
+           {
+               addMarker(lat, lng, id);
+               LastLatLng = generate_latLng(lat,lng);
+           }
+        }
+*/
