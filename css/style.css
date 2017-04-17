@@ -22,28 +22,41 @@ ul {
   list-style-type: none;
 }
 
+#latLng
+{
+    background-color: #787878;
+    opacity: 0.9;
+    z-index: 999
+    background-color: rgba(42,53,100,0.6);
+    position: relative;
+    height:70%;
+    width:100%;
+    right: 0%;
+    
+}
+
 #videoBox
 {
     background-color: #787878;
     opacity: 0.9;
     z-index: 999
-    background-color: rgba(51,87,134,0.8);
+    background-color: rgba(42,53,100,0.6);
     position: absolute;
-    height:40%;
-    width:40%;
-    right: 2%;
-    top: 5%;
+    height:50%;
+    width:30%;
+    left: 0%;
+    top: 0%;
     border-color: #000000;
     border-width: 0.3px;
     border-style: dashed;
     box-shadow: inset -1px 0px 1px 2px rgba(0 ,0, 0, 1);
 }
 
-.showVideo
+.showMarkerInfo
 {
 	position: relative;
 	top: 30%;
-	left: 10%;
+	left: 3%;
 }
 
 #Location-map
@@ -57,12 +70,28 @@ ul {
     
 }
 
+span{
+    margin: 0 0 10px 0;
+    opacity: 0.5;
+    position: relative;
+    height: 90%;
+    width: 90%;
+    z-index: 999
+    border: 1px solid #000000;
+    color: #787878;
+    float: left;
+    background-color: #ffffff;
+    font-family: 'Sanchez', serif;
+    float: left; 
+    clear: left;
+    top: 50%;
+}
 li {
 	margin: 0 0 10px 0;
 	opacity: 0.5;
 	position: relative;
 	height: 90%;
-	width: 10%;
+	width: 90%;
 	z-index: 999
     border: 1px solid #000000;
     color: #787878;

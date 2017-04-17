@@ -1,7 +1,6 @@
 
 $(function(){
-    
-        var videoDom = $('#videoBox > span');
+
         var map;
 
         function initialize() {
@@ -220,6 +219,8 @@ $(function(){
 
         initialize();
 
+        // Map Set
+
         var lineSymbol = {
           path: 'M 0,-1 0,1',
           strokeOpacity: 1,
@@ -232,7 +233,7 @@ $(function(){
             {lat:24.789821309352384, lng:120.99669348955154},
             {lat:24.789686160586442, lng:120.9966042183876},
         ];
-        console.log(monitorCoordinates1);
+
         var monitorArea1 = new google.maps.Polyline({
             path: monitorCoordinates1,
             geodesic: true,
@@ -254,6 +255,7 @@ $(function(){
               scaledSize: new google.maps.Size(32, 32)
             }
         });
+
         var monitorVertex1_2 = new google.maps.Marker({
             position: monitorCoordinates1[1],
             map: map,
@@ -262,6 +264,7 @@ $(function(){
               scaledSize: new google.maps.Size(32, 32)
             }
         });
+
         var monitorVertex1_3 = new google.maps.Marker({
             position: monitorCoordinates1[2],
             icon: {
@@ -280,6 +283,7 @@ $(function(){
             {lat:24.789731309352384, lng:120.99699348955154},
             {lat:24.789596160586442, lng:120.9969042183876}
         ];
+
         var monitorArea2 = new google.maps.Polyline({
             path: monitorCoordinates2,
             geodesic: true,
@@ -301,6 +305,7 @@ $(function(){
               scaledSize: new google.maps.Size(32, 32)
             }
         });
+
         var monitorVertex2_2 = new google.maps.Marker({
             position: monitorCoordinates2[1],
             map: map,
@@ -309,6 +314,7 @@ $(function(){
               scaledSize: new google.maps.Size(32, 32)
             }
         });
+
         var monitorVertex2_3 = new google.maps.Marker({
             position: monitorCoordinates2[2],
             icon: {
@@ -320,17 +326,22 @@ $(function(){
 
         monitorArea2.setMap(map);
 
+        // Set Two Triangles Indicating Monitor Area
+
         var receiveTime;
         var id;
         var lat;
         var lng;
         var description;
+
+        // We Will Recieve These Info From Input
+
         var LastLatLng = generate_latLng(24,121);;
         var ThisLastLng;
         
-function rad(x){
-return x*Math.PI/180;
-}
+        function rad(x){
+          return x*Math.PI/180;
+        }
         
         function getDistance(p1, p2) {
             var Earth_R = 6378137; // Earth’s mean radius in meter
@@ -343,11 +354,18 @@ return x*Math.PI/180;
             var d = Earth_R * c;
             return d; // returns the distance in meter
         }
+
         function generate_latLng(lat,lng)
         {
             var temp = new google.maps.LatLng(lat , lng);
             return temp;
         }
+
+        // For Rounding Error
+
+        var posDom = $('#PosSec > span');
+        var idDom = $('#IDSec > span');
+        var timeDom = $('#TimeSec > span');
 
         function IDGeoLoTime_O  (data){
            console.log(data[0]);
@@ -356,17 +374,20 @@ return x*Math.PI/180;
            lng = parseFloat(data[0].E);
            ThisLastLng = generate_latLng(lat,lng);
            receiveTime = data[0].Time;
+           var latandlng = "(" + lat + "," + lng + ")";
+           posDom.text(latandlng);
+           idDom.text(id);
+           timeDom.text(receiveTime);
            description = id + ': ' + receiveTime;
            if(id == "0" && getDistance(LastLatLng,ThisLastLng) > 1)
            {
                addMarker(lat, lng, id);
                LastLatLng = generate_latLng(lat,lng);
            }
-        }
-        function removeLine() {
-          for(var i = 0; i < polyLines.length; i++){
-            polyLines[i].setMap(null);
-          }
+           // id = 0 Since We Only Have One Dog Now
+           // Don't Add If Same Position
+           // getDistance(LastLatLng,ThisLastLng) < 1 ---> At Same Point 
+           // (1M Is Our Rounding Error)
         }
 
         var polyCoordinates = [];
@@ -376,20 +397,13 @@ return x*Math.PI/180;
         function addPolyLine(counterID, markerArr){
             //removeLine();
             var max = markerArr.length - 1;
-            console.log("Max: ", max);
-            console.log("CounterID: ", counterID);
             for(var i = 0; i < max; i++){ // Draw 9 lines Max
-              console.log("CounterID: ", counterID);
-
               polyCoordinates = [];              
-              //console.log(markerArr);
               polyCoordinates.push(markerArr[counterID%10].position);
               counterID--;
               if(counterID == -1)
                 counterID = 9;
-              //console.log(markerArr[counterID%10]);
               polyCoordinates.push(markerArr[counterID%10].position);
-              //counterID--;
               if(counterID == -1)
                 counterID = 9;
               //linR = Math.floor((Math.random() * 255) + 1);
@@ -397,7 +411,7 @@ return x*Math.PI/180;
               //linB = Math.floor((Math.random() * 255) + 1);
               //lineColor = rgbToHex(linR,linG,linB).toString();
               //lineColor = "#" + lineColor;
-              lineColor = "#00FF00";
+              lineColor = "#000000";
               var markersLine = new google.maps.Polyline({
                   path: polyCoordinates,
                   geodesic: true,
@@ -409,9 +423,16 @@ return x*Math.PI/180;
               polyLines.push(markersLine);
               //polyCoordinates.length = 0;
             }
+    
         }
 
-        
+        function removeLine() {
+          for(var i = 0; i < polyLines.length; i++){
+            polyLines[i].setMap(null);
+          }
+        }
+
+        // PolyLine To Trace Route
 
         function setMapOnAll(map, markerArr, notClearID) {
           for (var i = 0; i < markerArr.length; i++) {
@@ -424,54 +445,39 @@ return x*Math.PI/180;
           setMapOnAll(null, markerArr, notClearID);
         }
 
+        // To Show/Hide Markers
+
         var markersID1 = [];
         var markersID2 = [];
         var counterID1 = 0;
         var counterID2 = 0;
 
+        // We Only Use ID1 ATM , Because Only 1 Dog
+
         function addMarker(lat, lng, id)
         {          
-            // Don't add markers with same position into array
-            if(counterID1 == 0); // only the first marker will have counterID = 0
-            else if(parseFloat(markersID1[counterID1-1].position.lat()).toPrecision(12) == parseFloat(lat).toPrecision(12) && parseFloat(markersID1[counterID1-1].position.lng()).toPrecision(12) == parseFloat(lng).toPrecision(12)){
-                console.log("Same");
-                console.log("Same ID: ", counterID1-1);
-                //markersID1[counterID1-1].infoWindow.setContentHTML(description);
-                //Should update infoWindow, the upper syntax doesn't work. Fix it later.
-                return;
-            } 
-            console.log("Diff ID: ", counterID1-1);
-            console.log("---------------------");
-            if(counterID1 == 0);
-            else console.log(markersID1[counterID1-1].position.lat(), markersID1[counterID1-1].position.lng());
-            console.log(lat, lng);
-            console.log("---------------------");
-            changepinImage(89,193,84);
-            console.log(lat);
-            console.log(lng);
+            changepinImage(89,193,84); // Change Color
+
             var infowindow = new google.maps.InfoWindow({
               content: description
             });
+
             var marker = new google.maps.Marker({
                 position:{ lat: lat, lng: lng },
                 map: map, 
                 fillOpacity: 0.4,
                 icon: pinImage
                 });
-            console.log(marker);
 
             marker.addListener('click', function() {
                                infowindow.open(map, marker);
                                });
-            //infowindow.open(map,marker);
-            clearMarkers(markersID1, counterID1%10);
-            counterID1 = counterID1 % 10;
+
+            clearMarkers(markersID1, counterID1);
             markersID1[counterID1] = marker;
             addPolyLine(counterID1, markersID1);
             counterID1++;
-            console.log(markersID1[counterID1-1].position.lat());
-            console.log(lat);
-            displayVideo(lat, lng);
+            displayVideo(lat, lng); // Check If Inside Monitor
         }
         
         function displayVideo(lat, lng)
@@ -482,12 +488,13 @@ return x*Math.PI/180;
             monitorDisplay(isWithinMonitor1, isWithinMonitor2);
         }
 
+        // Check If Inside Monitor
+
         var previousMarker;
         var currentMarker;
         var firstCurrent = true;
         var infowindowAlert;
-        var contentString;
-
+        
         function monitorDisplay(inMonitorArea1, inMonitorArea2)
         {
             if(inMonitorArea1 || inMonitorArea2)
@@ -498,85 +505,21 @@ return x*Math.PI/180;
               if(inMonitorArea1)
               {
                 monitorPosition = monitorCoordinates1[1];
-monitorArea1.setOptions({strokeColor:'#FF0000'});
-$('#Video-Display').attr('src','http://admin:5131339@140.113.124.221/video1.mjpg');
-//alert('123');http://140.113.124.221/video1.mjpg
-//monitorArea1.setMap(map);http://www.youtube.com/embed/W5FRUM-AK9k
-}
-              else
-{
-                monitorPosition = monitorCoordinates2[1];
-monitorArea2.setOptions({strokeColor:'#FF0000'});
-$('#Video-Display').attr('src','http://admin:5131339@140.113.124.220/GetData.cgi?CH=1');
-//alert('456');https://www.youtube.com/embed/jYvVG8D837A
-//monitorArea2.setMap(map);
-}
-
-              changepinImage(177,26,26);
-              var markerAlert = new google.maps.Marker({
-                  position: monitorPosition,
-                  map: map, 
-                  fillOpacity: 0.4,
-                  icon: pinImage
-                  });
-              markerAlert.setVisible(false);
-              
-              contentString = '<div style="padding-left:10px;color: #000000;background: #000000;border-radius:10px 10px 5px 5px;">' +
-              '<iframe width="500" height="275" src="https://www.youtube.com/embed/jYvVG8D837A" frameborder="0" allowfullscreen></iframe>'
-              + '</div>';
-              infowindowAlert = new google.maps.InfoWindow({
-                    content: contentString
-                });
-//infowindowAlert.open(map, markerAlert);
-
-              if(firstCurrent)
-              {
-                firstCurrent = false;
-                currentMarker = markerAlert;
-                if(currentOpen)
-                {
-                  if(infowindowAlert)
-                    infowindowAlert.close();
-                  $(videoDom).html('');
-                  $(videoDom).append(contentString);
-                  infowindowAlert.open(map, currentMarker)
-                }
+                monitorArea1.setOptions({strokeColor:'#FF0000'}); // Red
+                $('#Video-Display').attr('src','http://admin:5131339@140.113.124.221/video1.mjpg');
               }
-              else
+              else // inMonitorArea2
               {
-                console.log("tttttttttt")
-                
-                if(currentOpen)
-                {
-                 if(infowindowAlert)
-                    infowindowAlert.close();
-                  previousMarker = currentMarker;
-                  console.log(currentMarker);
-                  console.log(previousMarker);
-                  currentMarker = markerAlert;
-                  $(videoDom).html('');
-                  $(videoDom).append(contentString);
-                  //infowindowAlert.open(map, currentMarker);
-                }
-                else if(previousOpen)
-                {
-                  if(infowindowAlert)
-                    infowindowAlert.close();
-                  previousMarker = currentMarker;
-                  console.log(currentMarker);
-                  console.log(previousMarker);
-                  currentMarker = markerAlert;
-                  $(videoDom).html('');
-                  $(videoDom).append(contentString);
-                  //infowindowAlert.open(map, previousMarker);
-                }
+                monitorPosition = monitorCoordinates2[1];
+                monitorArea2.setOptions({strokeColor:'#FF0000'}); // Red
+                $('#Video-Display').attr('src','http://admin:5131339@140.113.124.220/GetData.cgi?CH=1');
               }
             }
             else
             {
                 monitorArea1.setOptions({strokeColor:'#000000'});
                 monitorArea2.setOptions({strokeColor:'#000000'}); 
-                $('#Video-Display').attr('src','');
+                $('#Video-Display').attr('src','https://www.youtube.com/embed/hfJ5JEAccvo"');
                 //infowindowAlert.close(map, markerAlert);
             }
         }
@@ -592,68 +535,17 @@ $('#Video-Display').attr('src','http://admin:5131339@140.113.124.220/GetData.cgi
 
         function changepinImage(r,g,b)
         {
-            //console.log('hi');
             //pinR = Math.floor((Math.random() * 255) + 1);
             //pinG = Math.floor((Math.random() * 255) + 1);
             //pinB = Math.floor((Math.random() * 255) + 1);
             pinColor = rgbToHex(r,g,b).toString();
-            //console.log(pinColor);
             pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
             new google.maps.Size(21, 34),
             new google.maps.Point(0,0),
             new google.maps.Point(10, 34));
-            //console.log(pinImage);
         }
 
-        var currentOpen = false;
-        var previousOpen = false;
-        //var trackInfoWindow = [];
-
-        $('.showVideo li').on('click', function()
-        {
-          $('.showVideo li').removeClass('chosen');
-          $(this).addClass('chosen');
-          if(this.id == "Previous")
-          {
-            previousOpen = true;
-            currentOpen = false;
-            if(infowindowAlert)
-              infowindowAlert.close();
-            if(previousMarker)
-            {
-              $(videoDom).html('');
-              $(videoDom).append(contentString);
-              //infowindowAlert.open(map, previousMarker);
-            }
-            console.log("------------");
-            console.log(previousMarker);
-            console.log(currentMarker);
-            console.log("------------");
-
-          }
-          else if(this.id == "Current")
-          {
-            previousOpen = false;
-            currentOpen = true;
-            if(infowindowAlert)
-              infowindowAlert.close();
-            if(currentMarker)
-            {
-              $(videoDom).html('');
-              $(videoDom).append(contentString);
-              //infowindowAlert.open(map, currentMarker);
-            }
-          }
-          else
-          {
-            previousOpen = false;
-            currentOpen = false;
-            $(videoDom).html('');
-            if(infowindowAlert)
-              infowindowAlert.close();
-          }
-        });
-
+        // Change Marker Color
 
 
         function iot_app(){

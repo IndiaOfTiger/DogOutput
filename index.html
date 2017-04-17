@@ -16,14 +16,37 @@
     <script type="text/javascript" src="dist/js/map-icons.js"></script>
  </head>
   <body>
-   <div id="videoBox">
-     <span></span>
-   </div>
+   
    <div id="Location-map"></div>
+   <!--
    <ul class="showVideo">
     <li class="chosen" id="Close">Close</li>
     <li id="Previous">Previous</li>
     <li id="Current">Current</li>
-   </ul>    
+   </ul>   
+   !-->
+   <div id="videoBox">
+    <iframe id = "Video-Display" style="width:98%;height:98%" src="https://www.youtube.com/embed/hfJ5JEAccvo'" frameborder="0" allowfullscreen></iframe> <!-- fake video !-->
+    <div id="latLng">
+       <section id="lat">
+         <img src="image/marker.png" style="width:60px;height:80px">
+         <ul class="showMarkerInfo">
+          <li id="Position">Position: </li>
+          <section id="PosSec">
+            <span></span>
+          </section>
+          <!--<li id="ID">ID: </li>
+          <section id="IDsec">
+            <span></span>
+          </section>!-->
+          <li id="Time">Time: </li>
+          <section id="TimeSec">
+            <span></span>
+          </section>
+         </ul>
+         <span></span>
+       </section>
+    </div> 
+   </div>
   </body>
 <html>
